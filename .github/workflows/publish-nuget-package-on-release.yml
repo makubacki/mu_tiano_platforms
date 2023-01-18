@@ -1,0 +1,24 @@
+# This workflow publishes a NuGet package on a release in the repo.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Publish NuGet Package on Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  nuget_release:
+    name: Publish via Azure Pipeline
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure Pipeline Publication
+      uses: Azure/pipelines@v1
+      with:
+        azure-devops-project-url: https://dev.azure.com/projectmu/mu
+        azure-pipeline-name: 'Mu Tiano Platforms Release'
+        azure-devops-token: ${{ secrets.AZURE_DEVOPS_TOKEN }}

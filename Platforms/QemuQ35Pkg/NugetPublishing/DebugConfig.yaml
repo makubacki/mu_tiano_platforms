@@ -1,0 +1,8 @@
+author_string: Microsoft Core UEFI
+copyright_string: Copyright (c) Microsoft Corporation.
+description_string: QEMU Q35 DEBUG Platform Firmware
+license: dummy text
+name: TEST.Mu.QemuQ35.FW.DEBUG
+project_url: https://microsoft.github.com/mu
+server_url: https://pkgs.dev.azure.com/projectmu/mu/_packaging/Mu-Public/nuget/v3/index.json
+tags_string: ''

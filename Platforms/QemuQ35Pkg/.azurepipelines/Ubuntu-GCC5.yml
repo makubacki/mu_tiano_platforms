@@ -13,9 +13,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: main
+      endpoint: makubacki
+      name: makubacki/mu_devops
+      ref: add_run_to_shell_timeout_param
 
 variables:
 - group: architectures-x86-64
@@ -77,5 +77,6 @@ jobs:
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
         install_tools: false
+        run_timeout: 30
         extra_artifacts: |
           **/QEMUQ35_*.fd

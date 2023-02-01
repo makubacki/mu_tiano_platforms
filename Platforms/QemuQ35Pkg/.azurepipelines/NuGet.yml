@@ -98,6 +98,10 @@ jobs:
       displayName: Download NuGet Package License File
 
     - script: |
+        curl https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --output $(Build.SourcesDirectory)/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --create-dirs
+      displayName: 'TEMP: Download NuGet Publish Python Script'
+
+    - script: |
         curl $NUGET_PACKAGE_CONFIG_FILE --output $BUILD_ARTIFACTSTAGINGDIRECTORY/NugetConfigFile.txt
       displayName: Download NuGet Package Config File
 

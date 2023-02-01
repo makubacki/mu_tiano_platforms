@@ -48,6 +48,7 @@ class NugetSupport(object):
         <license></license>
         <releaseNotes></releaseNotes>
         <projectUrl></projectUrl>
+        <repositoryUrl></repositoryUrl>
         <copyright></copyright>
         <tags></tags>
     </metadata>

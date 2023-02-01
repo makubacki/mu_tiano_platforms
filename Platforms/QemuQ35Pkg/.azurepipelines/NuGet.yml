@@ -27,7 +27,7 @@ resources:
       name: makubacki/mu_devops
       ref: test_nuget_publishing
 
-name: Mu Tiano Platforms NuGet Release $(Date:yyyyMMdd)$(Rev:.r)
+name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms NuGet Release
 
 jobs:
   - job: Publish
@@ -35,38 +35,38 @@ jobs:
     strategy:
       matrix:
         ${{ if eq(parameters.publish_q35_binaries, true) }}:
-          Binaries QemuQ35Pkg DEBUG:
+          QEMU Q35 Debug:
+            artifact_name: Binaries QemuQ35Pkg DEBUG
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
-            nuget_package_folder_names: >-
-              Linux-x86,
-              Windows-x86
-            pipeline_names: >-
-              Mu Tiano Platforms Q35 Plat CI GCC5,
-              Mu Tiano Platforms Q35 Plat CI VS
+            gcc_folder_name: Linux-x86
+            gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
+            vs_folder_name: Windows-x86
+            vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
-          Binaries QemuQ35Pkg RELEASE:
+          QEMU Q35 Release:
+            artifact_name: Binaries QemuQ35Pkg RELEASE
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
-            nuget_package_folder_names: >-
-              Linux-x86,
-              Windows-x86
-            pipeline_names: >-
-              Mu Tiano Platforms Q35 Plat CI GCC5,
-              Mu Tiano Platforms Q35 Plat CI VS
+            gcc_folder_name: Linux-x86
+            gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
+            vs_folder_name: Windows-x86
+            vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
-        # ${{ if eq(parameters.publish_q35sbsa_binaries, true) }}:
-          # Binaries QemuSbsaPkg DEBUG:
-          #   nuget_package_folder_names: >-
-          #     Linux-x86
-          #   pipeline_names: >-
-          #     Mu Tiano Platforms SBSA Plat CI GCC5
+        ${{ if eq(parameters.publish_q35sbsa_binaries, true) }}:
+          QEMU Q35 SBSA Debug:
+            artifact_name: Binaries QemuSbsaPkg DEBUG
+            gcc_folder_name: Linux-x86
+            gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
+            vs_folder_name: ''
+            vs_pipeline_name: ''
 
-          # Binaries QemuSbsaPkg RELEASE:
-          #   nuget_package_folder_names: >-
-          #     Linux-x86
-          #   pipeline_names: >-
-          #     Mu Tiano Platforms SBSA Plat CI GCC5
+          QEMU Q35 SBSA Release:
+            artifact_name: Binaries QemuSbsaPkg RELEASE
+            gcc_folder_name: Linux-x86
+            gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
+            vs_folder_name: ''
+            vs_pipeline_name: ''
 
     workspace:
       clean: all
@@ -94,12 +94,6 @@ jobs:
       displayName: Get Current Repo Release Version
 
     - script: |
-        prefixToRemove="Job "
-        artifactName=$(echo "${AGENT_JOBNAME/#$prefixToRemove}")
-        echo "##vso[task.setvariable variable=artifact_name;]${artifactName}"
-      displayName: Get Artifact Name
-
-    - script: |
         curl https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/License.txt --output $BUILD_ARTIFACTSTAGINGDIRECTORY/License.txt
       displayName: Download NuGet Package License File
 
@@ -107,44 +101,63 @@ jobs:
         curl $NUGET_PACKAGE_CONFIG_FILE --output $BUILD_ARTIFACTSTAGINGDIRECTORY/NugetConfigFile.txt
       displayName: Download NuGet Package Config File
 
-    - ${{ each pipeline_name in split(variables.pipeline_names, ',') }}:
-      - ${{ each package_folder in split(variables.nuget_package_folder_names, ',') }}:
-        - task: DownloadBuildArtifacts@0
-          name: DownloadBuildArtifacts
-          displayName: Download ${{ pipeline_name.value }} Artifacts
-          inputs:
-            buildType: 'specific'
-            project: $(System.TeamProject)
-            pipeline: ${{ pipeline_name.value }}
-            specificBuildWithTriggering: true
-            buildVersionToDownload: 'latest'
-            downloadType: 'single'
-            artifactName: $(artifact_name)
-            downloadPath: '$(Build.ArtifactStagingDirectory)/${{ package_folder.value }}'
+    - task: DownloadBuildArtifacts@0
+      name: DownloadGccBuildArtifacts
+      displayName: Download GCC Build Artifacts
+      inputs:
+        buildType: 'specific'
+        project: $(System.TeamProject)
+        pipeline: $(gcc_pipeline_name)
+        specificBuildWithTriggering: true
+        buildVersionToDownload: 'latest'
+        downloadType: 'single'
+        artifactName: $(artifact_name)
+        downloadPath: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
 
-        - task: CopyFiles@2
-          displayName: "Copy ${{ package_folder.value }} Binaries"
-          inputs:
-            targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/${{ package_folder.value }}'
-            sourceFolder: '$(Build.ArtifactStagingDirectory)/${{ package_folder.value }}/**'
-            contents: '**'
-            flattenFolders: true
+    - task: DownloadBuildArtifacts@0
+      name: DownloadVisualStudioBuildArtifacts
+      displayName: Download Visual Studio Build Artifacts
+      inputs:
+        buildType: 'specific'
+        project: $(System.TeamProject)
+        pipeline: $(vs_pipeline_name)
+        specificBuildWithTriggering: true
+        buildVersionToDownload: 'latest'
+        downloadType: 'single'
+        artifactName: $(artifact_name)
+        downloadPath: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
 
-      - task: Bash@3
-        name: PackAndPublishNugetPackage
-        displayName: Pack and Push Nuget Package
-        env:
-          LICENSE_FILE_PATH: $(Build.ArtifactStagingDirectory)/License.txt
-          NUGET_KEY: $(NUGET_KEY)
-          NUGET_PACKAGE_CONFIG_FILE_PATH: $(Build.ArtifactStagingDirectory)/NugetConfigFile.txt
-          NUGET_PACKAGE_VERSION: $(repo_version)
-        inputs:
-          targetType: 'inline'
-          script: |
-            apiKey=$NUGET_KEY
-            configFilePath=$NUGET_PACKAGE_CONFIG_FILE_PATH
-            customLicensePath=$LICENSE_FILE_PATH
-            inputFolderPath="$(BUILD_STAGINGDIRECTORY)/Nuget/package_contents"
-            outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
-            packageVersion=$NUGET_PACKAGE_VERSION
-            python3 $(Build.SourcesDirectory)/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath"
+    - task: CopyFiles@2
+      displayName: "Copy GCC Binaries"
+      inputs:
+        targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)/**'
+        contents: '**'
+        flattenFolders: true
+
+    - task: CopyFiles@2
+      displayName: "Copy Visual Studio Binaries"
+      inputs:
+        targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(vs_folder_name)'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)/**'
+        contents: '**'
+        flattenFolders: true
+
+    - task: Bash@3
+      name: PackAndPublishNugetPackage
+      displayName: Pack and Push Nuget Package
+      env:
+        LICENSE_FILE_PATH: $(Build.ArtifactStagingDirectory)/License.txt
+        NUGET_KEY: $(NUGET_KEY)
+        NUGET_PACKAGE_CONFIG_FILE_PATH: $(Build.ArtifactStagingDirectory)/NugetConfigFile.txt
+        NUGET_PACKAGE_VERSION: $(repo_version)
+      inputs:
+        targetType: 'inline'
+        script: |
+          apiKey=$NUGET_KEY
+          configFilePath=$NUGET_PACKAGE_CONFIG_FILE_PATH
+          customLicensePath=$LICENSE_FILE_PATH
+          inputFolderPath="$(BUILD_STAGINGDIRECTORY)/Nuget/package_contents"
+          outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
+          packageVersion=$NUGET_PACKAGE_VERSION
+          python3 $(Build.SourcesDirectory)/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath"

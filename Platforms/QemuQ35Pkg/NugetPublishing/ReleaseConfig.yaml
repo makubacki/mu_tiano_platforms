@@ -1,7 +1,6 @@
 author_string: Microsoft Core UEFI
 copyright_string: Copyright (c) Microsoft Corporation.
 description_string: QEMU Q35 RELEASE Platform Firmware
-license: dummy text
 name: TEST.Mu.QemuQ35.FW.RELEASE
 project_url: https://microsoft.github.io/mu/
 repository_url: https://github.com/makubacki/mu_tiano_platforms

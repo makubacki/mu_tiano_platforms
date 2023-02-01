@@ -131,7 +131,7 @@ jobs:
       displayName: "Copy GCC Binaries"
       inputs:
         targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
-        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)/**'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
         contents: '**'
         flattenFolders: true
 
@@ -139,7 +139,7 @@ jobs:
       displayName: "Copy Visual Studio Binaries"
       inputs:
         targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(vs_folder_name)'
-        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)/**'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
         contents: '**'
         flattenFolders: true
 

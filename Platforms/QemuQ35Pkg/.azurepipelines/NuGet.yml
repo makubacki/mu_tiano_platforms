@@ -164,4 +164,5 @@ jobs:
           inputFolderPath="${BUILD_STAGINGDIRECTORY]/Nuget/package_contents"
           outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
           packageVersion=$NUGET_PACKAGE_VERSION
-          python3 ${BUILD_SOURCESDIRECTORY}/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath"
+          printenv
+          echo python3 ${BUILD_SOURCESDIRECTORY}/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath"

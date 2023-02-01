@@ -36,7 +36,7 @@ jobs:
       matrix:
         ${{ if eq(parameters.publish_q35_binaries, true) }}:
           QEMU Q35 Debug:
-            artifact_name: Binaries QemuQ35Pkg DEBUG
+            artifact_name: Build Logs QemuQ35_DEBUG
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
             gcc_folder_name: Linux-x86
@@ -45,7 +45,7 @@ jobs:
             vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
           QEMU Q35 Release:
-            artifact_name: Binaries QemuQ35Pkg RELEASE
+            artifact_name: Build Logs QemuQ35_RELEASE
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
             gcc_folder_name: Linux-x86
@@ -55,14 +55,14 @@ jobs:
 
         ${{ if eq(parameters.publish_q35sbsa_binaries, true) }}:
           QEMU Q35 SBSA Debug:
-            artifact_name: Binaries QemuSbsaPkg DEBUG
+            artifact_name: Build Logs QemuSbsa_DEBUG
             gcc_folder_name: Linux-x86
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
             vs_pipeline_name: ''
 
           QEMU Q35 SBSA Release:
-            artifact_name: Binaries QemuSbsaPkg RELEASE
+            artifact_name: Build Logs QemuSbsa_RELEASE
             gcc_folder_name: Linux-x86
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''

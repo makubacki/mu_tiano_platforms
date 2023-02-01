@@ -48,7 +48,7 @@ class NugetSupport(object):
         <license></license>
         <releaseNotes></releaseNotes>
         <projectUrl></projectUrl>
-        <repositoryUrl></repositoryUrl>
+        <repository />
         <copyright></copyright>
         <tags></tags>
     </metadata>
@@ -221,7 +221,9 @@ class NugetSupport(object):
         meta.find("authors").text = self.ConfigData["author_string"]
         meta.find("projectUrl").text = self.ConfigData["project_url"]
         if "repository_url" in self.ConfigData:
-            meta.find("repositoryUrl").text = self.ConfigData["repository_url"]
+            r = meta.find("repository")
+            r.set("type", "git")
+            r.set("url", self.ConfigData["repository_url"])
         meta.find("description").text = self.ConfigData["description_string"]
         meta.find("copyright").text = self.ConfigData["copyright_string"]
         if "tags_string" in self.ConfigData:

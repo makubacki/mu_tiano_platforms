@@ -132,7 +132,7 @@ jobs:
         downloadPath: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
 
     - task: CopyFiles@2
-      displayName: "Copy GCC Binaries"
+      displayName: Copy GCC Binaries
       inputs:
         targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
@@ -140,7 +140,7 @@ jobs:
         flattenFolders: true
 
     - task: CopyFiles@2
-      displayName: "Copy Visual Studio Binaries"
+      displayName: Copy Visual Studio Binaries
       inputs:
         targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(vs_folder_name)'
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
@@ -161,7 +161,7 @@ jobs:
           apiKey=$NUGET_KEY
           configFilePath=$NUGET_PACKAGE_CONFIG_FILE_PATH
           customLicensePath=$LICENSE_FILE_PATH
-          inputFolderPath="${BUILD_STAGINGDIRECTORY]/Nuget/package_contents"
+          inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
           outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
           packageVersion=$NUGET_PACKAGE_VERSION
           printenv

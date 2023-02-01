@@ -132,7 +132,7 @@ jobs:
       inputs:
         targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
-        contents: '**'
+        contents: '**/*.fd'
         flattenFolders: true
 
     - task: CopyFiles@2
@@ -140,7 +140,7 @@ jobs:
       inputs:
         targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(vs_folder_name)'
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
-        contents: '**'
+        contents: '**/*.fd'
         flattenFolders: true
 
     - task: Bash@3

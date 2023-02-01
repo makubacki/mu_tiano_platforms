@@ -111,22 +111,22 @@ jobs:
       - ${{ each package_folder in split(variables.nuget_package_folder_names, ',') }}:
         - task: DownloadBuildArtifacts@0
           name: DownloadBuildArtifacts
-          displayName: Download ${{ pipeline_name }} Artifacts
+          displayName: Download ${{ pipeline_name.value }} Artifacts
           inputs:
             buildType: 'specific'
             project: $(System.TeamProject)
-            pipeline: ${{ pipeline_name }}
+            pipeline: ${{ pipeline_name.value }}
             specificBuildWithTriggering: true
             buildVersionToDownload: 'latest'
             downloadType: 'single'
             artifactName: $(artifact_name)
-            downloadPath: '$(Build.ArtifactStagingDirectory)/${{ package_folder }}'
+            downloadPath: '$(Build.ArtifactStagingDirectory)/${{ package_folder.value }}'
 
         - task: CopyFiles@2
-          displayName: "Copy ${{ package_folder }} Binaries"
+          displayName: "Copy ${{ package_folder.value }} Binaries"
           inputs:
-            targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/${{ package_folder }}'
-            sourceFolder: '$(Build.ArtifactStagingDirectory)/${{ package_folder }}/**'
+            targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/${{ package_folder.value }}'
+            sourceFolder: '$(Build.ArtifactStagingDirectory)/${{ package_folder.value }}/**'
             contents: '**'
             flattenFolders: true
 

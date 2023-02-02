@@ -94,6 +94,7 @@ jobs:
         rawRepoVer=$(curl -s https://api.github.com/repos/makubacki/mu_tiano_platforms/releases | jq -r '.[0].name')
         prefixToRemove="v"
         repoVer=$(echo "${rawRepoVer/#$prefixToRemove}")
+        echo "##vso[task.setvariable variable=raw_repo_version;]${rawRepoVer}"
         echo "##vso[task.setvariable variable=repo_version;]${repoVer}"
       displayName: Get Current Repo Release Version
 
@@ -190,11 +191,12 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
-          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${INPUT_FOLDER_PATH}"
+          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip $INPUT_FOLDER_PATH
           curl \
-            -X PATCH \
+            -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GH_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/makubacki/mu_tiano_platforms/releases/assets/1 \
-            -d '{"name":"$NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip","label":"$NUGET_PACKAGE_VERSION NuGet Package Zip File"}'
+            -H "Content-Type: application/zip" \
+            https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${RAW_REPO_VERSION}/assets?name=$NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip \
+            --data-binary "@${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip"

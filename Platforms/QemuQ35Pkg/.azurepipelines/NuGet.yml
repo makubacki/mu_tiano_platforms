@@ -188,6 +188,7 @@ jobs:
         INPUT_FOLDER_PATH: "$(Build.StagingDirectory)/Nuget/package_contents"
         NUGET_PACKAGE_NAME: $(nuget_package_name)
         NUGET_PACKAGE_VERSION: $(repo_version)
+        RAW_REPO_VERSION: $(raw_repo_version)
       inputs:
         targetType: 'inline'
         script: |
@@ -200,6 +201,6 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GH_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            -H "Content-Type: application/zip" \
-            https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${RAW_REPO_VERSION}/assets?name=$NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip \
+            -H "Content-Type: application/octet-stream" \
+            "https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${RAW_REPO_VERSION}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
             --data-binary "@${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip"

@@ -192,7 +192,7 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
-          tags=$(curl -sH "https://api.github.com/repos/makubacki/mu_tiano_platforms/tags/${RAW_REPO_VERSION})")
+          tags=$(curl -sH "Authorization: token $GH_TOKEN" https://api.github.com/repos/makubacki/mu_tiano_platforms/tags/$RAW_REPO_VERSION)
           eval $(echo "$tags" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')
           [ "$id" ] || { echo "Error: Failed to get release id for tag: $tag"; echo "$tags" | awk 'length($0)<100' >&2; exit 1; }
           inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"

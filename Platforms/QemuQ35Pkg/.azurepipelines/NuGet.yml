@@ -56,6 +56,8 @@ jobs:
         ${{ if eq(parameters.publish_q35sbsa_binaries, true) }}:
           QEMU Q35 SBSA Debug:
             artifact_name: Build Logs QemuSbsa_DEBUG
+            nuget_package_config_file: >-
+              https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
             gcc_folder_name: Linux-x86
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
@@ -63,6 +65,8 @@ jobs:
 
           QEMU Q35 SBSA Release:
             artifact_name: Build Logs QemuSbsa_RELEASE
+            nuget_package_config_file: >-
+              https://raw.githubusercontent.com/makubacki/mu_tiano_platforms/test_nuget_publishing/Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml
             gcc_folder_name: Linux-x86
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
@@ -117,6 +121,16 @@ jobs:
         downloadType: 'single'
         artifactName: $(artifact_name)
         downloadPath: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
+      condition: and(ne(variables.gcc_folder_name, ''), ne(variables.gcc_pipeline_name, ''))
+
+    - task: CopyFiles@2
+      displayName: Copy GCC Binaries
+      inputs:
+        targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
+        contents: '**/*.fd'
+        flattenFolders: true
+      condition: and(ne(variables.gcc_folder_name, ''), ne(variables.gcc_pipeline_name, ''))
 
     - task: DownloadBuildArtifacts@0
       name: DownloadVisualStudioBuildArtifacts
@@ -130,14 +144,7 @@ jobs:
         downloadType: 'single'
         artifactName: $(artifact_name)
         downloadPath: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
-
-    - task: CopyFiles@2
-      displayName: Copy GCC Binaries
-      inputs:
-        targetFolder: '$(Build.StagingDirectory)/Nuget/package_contents/$(gcc_folder_name)'
-        sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
-        contents: '**/*.fd'
-        flattenFolders: true
+      condition: and(ne(variables.vs_folder_name, ''), ne(variables.vs_pipeline_name, ''))
 
     - task: CopyFiles@2
       displayName: Copy Visual Studio Binaries
@@ -146,6 +153,7 @@ jobs:
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
         contents: '**/*.fd'
         flattenFolders: true
+      condition: and(ne(variables.vs_folder_name, ''), ne(variables.vs_pipeline_name, ''))
 
     - task: Bash@3
       name: PackAndPublishNugetPackage

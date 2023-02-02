@@ -114,7 +114,9 @@ class NugetSupport(object):
         with open(self.Config, "r") as c:
             self.ConfigData = yaml.safe_load(c)
 
-    def SetBasicData(self, authors, license, project, description, server, copyright, repository=None):
+    def SetBasicData(self, authors, license, project, description, server,
+            copyright, repositoryUrl=None, repositoryBranch=None,
+            repositoryCommit=None):
         """Set basic data in the config data."""
         self.ConfigData["author_string"] = authors
         if license:
@@ -122,9 +124,12 @@ class NugetSupport(object):
         self.ConfigData["project_url"] = project
         self.ConfigData["description_string"] = description
         self.ConfigData["server_url"] = server
-        if repository:
-            self.ConfigData["repository_url"] = repository
-
+        if repositoryUrl:
+            self.ConfigData["repository_url"] = repositoryUrl
+        if repositoryBranch:
+            self.ConfigData["repository_branch"] = repositoryBranch
+        if repositoryCommit:
+            self.ConfigData["repository_commit"] = repositoryCommit
         if not copyright:
             copyright = "Copyright %d" % datetime.date.today().year
         self.ConfigData["copyright_string"] = copyright
@@ -220,10 +225,15 @@ class NugetSupport(object):
         meta.find("version").text = self.NewVersion
         meta.find("authors").text = self.ConfigData["author_string"]
         meta.find("projectUrl").text = self.ConfigData["project_url"]
-        if "repository_url" in self.ConfigData:
+        if "repository" in self.ConfigData:
             r = meta.find("repository")
             r.set("type", "git")
-            r.set("url", self.ConfigData["repository_url"])
+            if "repository_url" in self.ConfigData:
+                r.set("url", self.ConfigData["repository_url"])
+            if "repository_branch" in self.ConfigData:
+                r.set("branch", self.ConfigData["repository_branch"])
+            if "repository_commit" in self.ConfigData:
+                r.set("commit", self.ConfigData["repository_commit"])
         meta.find("description").text = self.ConfigData["description_string"]
         meta.find("copyright").text = self.ConfigData["copyright_string"]
         if "tags_string" in self.ConfigData:
@@ -375,7 +385,9 @@ def GatherArguments():
                             required=True)
         parser.add_argument('--Author', dest="Author", help="<Required> Author string for publishing", required=True)
         parser.add_argument("--ProjectUrl", dest="Project", help="<Required> Project Url", required=True)
-        parser.add_argument("--RepositoryUrl", dest="RepositoryUrl", help="<Required> Repository Url", required=False)
+        parser.add_argument("--RepositoryUrl", dest="RepositoryUrl", help="<Optional> Repository Url", required=False)
+        parser.add_argument("--RepositoryBranch", dest="RepositoryBranch", help="<Optional> Repository Branch", required=False)
+        parser.add_argument("--RepositoryCommit", dest="RepositoryCommit", help="<Optional> Repository Commit", required=False)
         parser.add_argument('--LicenseIdentifier', dest="LicenseIdentifier", default=None,
                             choices=LICENSE_IDENTIFIER_SUPPORTED.keys(), help="Standard Licenses")
         parser.add_argument('--Description', dest="Description",
@@ -465,7 +477,16 @@ def main():
         else:
             license = LICENSE_IDENTIFIER_SUPPORTED[args.LicenseIdentifier]
 
-        nu.SetBasicData(args.Author, license, args.Project, args.Description, args.FeedUrl, args.Copyright, args.RepositoryUrl)
+        nu.SetBasicData(
+            args.Author,
+            license,
+            args.Project,
+            args.Description,
+            args.FeedUrl,
+            args.Copyright,
+            args.RepositoryUrl,
+            args.RepositoryBranch,
+            args.RepositoryCommit)
         nu.LogObject()
         ret = nu.ToConfigFile(ConfigFilePath)
         return ret

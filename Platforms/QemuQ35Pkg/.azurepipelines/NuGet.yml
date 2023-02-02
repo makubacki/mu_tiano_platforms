@@ -96,9 +96,20 @@ jobs:
         id=$(cat release_response.json | jq -r '.id')
         prefixToRemove="v"
         repoVer=$(echo "${rawRepoVer/#$prefixToRemove}")
+        echo "##vso[task.setvariable variable=raw_repo_version;]${rawRepoVer}"
         echo "##vso[task.setvariable variable=repo_version;]${repoVer}"
         echo "##vso[task.setvariable variable=repo_release_id;]${id}"
       displayName: Get Current Repo Release ID & Version
+
+    - script: |
+        read type tagSha < <(echo $(curl -s "https://api.github.com/repos/makubacki/mu_tiano_platforms/git/ref/tags/$RAW_REPO_VERSION" | jq -r '.object.type,.object.sha'))
+        if [ $type == "commit" ]; then
+          echo "##vso[task.setvariable variable=repo_release_commit_sha;]${tagSha}"
+        else
+          finalTagSha=$(curl -s "https://api.github.com/repos/makubacki/mu_tiano_platforms/git/tags/$tagSha" | jq '.object.sha')
+          echo "##vso[task.setvariable variable=repo_release_commit_sha;]${finalTagSha}"
+        fi
+      displayName: Get Current Release Commit Hash
 
     - script: |
         curl https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/License.txt --output $BUILD_ARTIFACTSTAGINGDIRECTORY/License.txt
@@ -171,6 +182,7 @@ jobs:
         NUGET_KEY: $(NUGET_KEY)
         NUGET_PACKAGE_CONFIG_FILE_PATH: $(Build.ArtifactStagingDirectory)/NugetConfigFile.txt
         NUGET_PACKAGE_VERSION: $(repo_version)
+        RELEASE_COMMIT_SHA: $(repo_release_commit_sha)
       inputs:
         targetType: 'inline'
         script: |
@@ -180,7 +192,8 @@ jobs:
           inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
           outputLogPath="${BUILD_STAGINGDIRECTORY}/Nuget/NugetPackagingLog.txt"
           packageVersion=$NUGET_PACKAGE_VERSION
-          python3 ${BUILD_SOURCESDIRECTORY}/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath"
+          releaseCommitSha=$RELEASE_COMMIT_SHA
+          python3 ${BUILD_SOURCESDIRECTORY}/Platforms/QemuQ35Pkg/.azurepipelines/nuget_publishing_with_repo_support.py --Operation PackAndPush --OutputLog "$outputLogPath" --ConfigFilePath "$configFilePath" --InputFolderPath "$inputFolderPath" --Version "$packageVersion" --ApiKey "$apiKey" --CustomLicensePath "$customLicensePath" --RepositoryCommit "$releaseCommitSha"
 
     - task: Bash@3
       name: ZipAndPublishReleaseAsset

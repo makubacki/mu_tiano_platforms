@@ -209,8 +209,6 @@ jobs:
         script: |
           inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
           zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${inputFolderPath}"
-          pwd
-          ls -l
           curl \
             -X POST \
             -H "Accept: application/vnd.github+json" \

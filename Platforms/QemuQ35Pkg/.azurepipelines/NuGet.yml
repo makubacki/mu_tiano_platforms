@@ -110,7 +110,7 @@ jobs:
       displayName: Download NuGet Package Config File
 
     - script: |
-        nugetPackageName=$(grep '^name:' License.txt | cut -d: -f2 | xargs)
+        nugetPackageName=$(grep '^name:' $BUILD_ARTIFACTSTAGINGDIRECTORY/NugetConfigFile.txt | cut -d: -f2 | xargs)
         echo "##vso[task.setvariable variable=nuget_package_name;]${nugetPackageName}"
       displayName: Get NuGet Package Name
 
@@ -190,7 +190,7 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
-          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip $INPUT_FOLDER_PATH
+          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${INPUT_FOLDER_PATH}"
           curl \
             -X PATCH \
             -H "Accept: application/vnd.github+json" \

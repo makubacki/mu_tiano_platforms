@@ -110,7 +110,7 @@ jobs:
       displayName: Download NuGet Package Config File
 
     - script: |
-        nugetPackageName=$(grep '^name:' License.txt | cut -d: -f2 | xargs)
+        nugetPackageName=$(grep '^name:' $BUILD_ARTIFACTSTAGINGDIRECTORY/NugetConfigFile.txt | cut -d: -f2 | xargs)
         echo "##vso[task.setvariable variable=nuget_package_name;]${nugetPackageName}"
       displayName: Get NuGet Package Name
 

@@ -87,7 +87,7 @@ jobs:
       displayName: Install edk2-pytool-extensions
 
     - script: |
-        rawRepoVer=$(curl -s https://api.github.com/repos/microsoft/mu_devops/releases | jq -r '.[0].name')
+        rawRepoVer=$(curl -s https://api.github.com/repos/makubacki/mu_tiano_platforms/releases | jq -r '.[0].name')
         prefixToRemove="v"
         repoVer=$(echo "${rawRepoVer/#$prefixToRemove}")
         echo "##vso[task.setvariable variable=repo_version;]${repoVer}"

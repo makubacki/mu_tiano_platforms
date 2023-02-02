@@ -174,6 +174,18 @@ class NugetSupport(object):
         self.ConfigData["tags_string"] = " ".join(tags)
         self.ConfigChanged = True
 
+    def UpdateRepositoryInfo(self, url=None, branch=None, commit=None):
+        """Update repository information."""
+        if url:
+            self.ConfigData["repository_url"] = url
+            self.ConfigChanged = True
+        if branch:
+            self.ConfigData["repository_branch"] = branch
+            self.ConfigChanged = True
+        if commit:
+            self.ConfigData["repository_commit"] = commit
+            self.ConfigChanged = True
+
     def Print(self):
         """Print info about the Nuget Object."""
         print("=======================================")
@@ -415,6 +427,9 @@ def GatherArguments():
         parser.add_argument('--CustomLicensePath', dest="CustomLicensePath", default=None,
                             help="<Optional> If CustomLicense set in `new` phase, provide absolute path of License \
                             File to pack. Does not override existing valid license.")
+        parser.add_argument("--RepositoryUrl", dest="RepositoryUrl", help="<Optional> Change the repository Url", required=False)
+        parser.add_argument("--RepositoryBranch", dest="RepositoryBranch", help="<Optional> Change the repository branch", required=False)
+        parser.add_argument("--RepositoryCommit", dest="RepositoryCommit", help="<Optional> Change the repository commit", required=False)
 
     elif (args.op.lower() == "push"):
         parser.add_argument("--ConfigFilePath", dest="ConfigFilePath",
@@ -529,6 +544,9 @@ def main():
 
         if (args.Copyright is not None):
             nu.UpdateCopyright(args.Copyright)
+
+        nu.UpdateRepositoryInfo(args.RepositoryUrl, args.RepositoryBranch, args.RepositoryCommit)
+
         if (len(args.Tags) > 0):
             tagListSet = set()
             for item in args.Tags:  # Parse out the individual packages

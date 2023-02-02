@@ -192,6 +192,9 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
+          tags=$(curl -sH "https://api.github.com/repos/makubacki/mu_tiano_platforms/tags/${RAW_REPO_VERSION})")
+          eval $(echo "$tags" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')
+          [ "$id" ] || { echo "Error: Failed to get release id for tag: $tag"; echo "$tags" | awk 'length($0)<100' >&2; exit 1; }
           inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
           zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${inputFolderPath}"
           pwd
@@ -202,5 +205,5 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -H "Content-Type: application/octet-stream" \
-            "https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${RAW_REPO_VERSION}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
+            "https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${id}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
             --data-binary "@${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip"

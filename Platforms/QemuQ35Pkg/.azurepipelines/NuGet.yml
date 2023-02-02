@@ -208,7 +208,7 @@ jobs:
         targetType: 'inline'
         script: |
           inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
-          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${inputFolderPath}"
+          zip -r -j $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${inputFolderPath}"
           curl \
             -X POST \
             -H "Accept: application/vnd.github+json" \

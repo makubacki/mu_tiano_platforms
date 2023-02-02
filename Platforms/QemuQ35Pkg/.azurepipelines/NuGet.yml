@@ -191,7 +191,8 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
-          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip $INPUT_FOLDER_PATH
+          inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
+          zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${inputFolderPath}"
           pwd
           ls -l
           curl \

@@ -91,12 +91,14 @@ jobs:
       displayName: Install edk2-pytool-extensions
 
     - script: |
-        rawRepoVer=$(curl -s https://api.github.com/repos/makubacki/mu_tiano_platforms/releases | jq -r '.[0].name')
+        curl -s https://api.github.com/repos/makubacki/mu_tiano_platforms/releases/latest --output release_response.json
+        rawRepoVer=$(cat release_response.json | jq -r '.name')
+        id=$(cat release_response.json | jq -r '.id')
         prefixToRemove="v"
         repoVer=$(echo "${rawRepoVer/#$prefixToRemove}")
-        echo "##vso[task.setvariable variable=raw_repo_version;]${rawRepoVer}"
         echo "##vso[task.setvariable variable=repo_version;]${repoVer}"
-      displayName: Get Current Repo Release Version
+        echo "##vso[task.setvariable variable=repo_release_id;]${id}"
+      displayName: Get Current Repo Release ID & Version
 
     - script: |
         curl https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/License.txt --output $BUILD_ARTIFACTSTAGINGDIRECTORY/License.txt
@@ -188,13 +190,10 @@ jobs:
         INPUT_FOLDER_PATH: "$(Build.StagingDirectory)/Nuget/package_contents"
         NUGET_PACKAGE_NAME: $(nuget_package_name)
         NUGET_PACKAGE_VERSION: $(repo_version)
-        RAW_REPO_VERSION: $(raw_repo_version)
+        REPO_RELEASE_ID: $(repo_release_id)
       inputs:
         targetType: 'inline'
         script: |
-          tags=$(curl -sH "Authorization: token $GH_TOKEN" https://api.github.com/repos/makubacki/mu_tiano_platforms/tags/$RAW_REPO_VERSION)
-          eval $(echo "$tags" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')
-          [ "$id" ] || { echo "Error: Failed to get release id for tag: $tag"; echo "$tags" | awk 'length($0)<100' >&2; exit 1; }
           inputFolderPath="${BUILD_STAGINGDIRECTORY}/Nuget/package_contents"
           zip -r $NUGET_PACKAGE_NAME-$NUGET_PACKAGE_VERSION.zip "${inputFolderPath}"
           pwd
@@ -205,5 +204,5 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -H "Content-Type: application/octet-stream" \
-            "https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${id}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
+            "https://uploads.github.com/repos/makubacki/mu_tiano_platforms/releases/${REPO_RELEASE_ID}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
             --data-binary "@${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip"

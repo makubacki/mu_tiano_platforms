@@ -27,18 +27,18 @@ jobs:
             artifact_name: Binaries QemuQ35Pkg DEBUG
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
-            gcc_folder_name: Linux-x86
+            gcc_folder_name: GCC-x64
             gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
-            vs_folder_name: Windows-x86
+            vs_folder_name: VisualStudio-x64
             vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
           QEMU Q35 Release:
             artifact_name: Binaries QemuQ35Pkg RELEASE
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
-            gcc_folder_name: Linux-x86
+            gcc_folder_name: GCC-x64
             gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
-            vs_folder_name: Windows-x86
+            vs_folder_name: VisualStudio-x64
             vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
         ${{ if eq(parameters.publish_q35sbsa_binaries, true) }}:
@@ -46,7 +46,7 @@ jobs:
             artifact_name: Binaries QemuSbsaPkg DEBUG
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
-            gcc_folder_name: Linux-x86
+            gcc_folder_name: GCC-AARCH64
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
             vs_pipeline_name: ''
@@ -55,7 +55,7 @@ jobs:
             artifact_name: Binaries QemuSbsaPkg RELEASE
             nuget_package_config_file: >-
               https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml
-            gcc_folder_name: Linux-x86
+            gcc_folder_name: GCC-AARCH64
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
             vs_pipeline_name: ''

@@ -10,8 +10,8 @@ parameters:
   displayName: Publish QEMU Q35 Binaries
   type: boolean
   default: true
-- name: publish_q35sbsa_binaries
-  displayName: Publish QEMU Q35 SBSA Binaries
+- name: publish_sbsa_binaries
+  displayName: Publish QEMU SBSA Binaries
   type: boolean
   default: true
 
@@ -47,8 +47,8 @@ jobs:
             vs_folder_name: VisualStudio-x64
             vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
-        ${{ if eq(parameters.publish_q35sbsa_binaries, true) }}:
-          QEMU Q35 SBSA Debug:
+        ${{ if eq(parameters.publish_sbsa_binaries, true) }}:
+          QEMU SBSA Debug:
             artifact_name: Binaries QemuSbsaPkg DEBUG
             nuget_package_config_file: >-
               Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
@@ -57,7 +57,7 @@ jobs:
             vs_folder_name: ''
             vs_pipeline_name: ''
 
-          QEMU Q35 SBSA Release:
+          QEMU SBSA Release:
             artifact_name: Binaries QemuSbsaPkg RELEASE
             nuget_package_config_file: >-
               Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml

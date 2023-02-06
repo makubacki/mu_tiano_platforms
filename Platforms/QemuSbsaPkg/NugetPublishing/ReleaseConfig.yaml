@@ -1,7 +1,7 @@
 author_string: Microsoft Core UEFI
 copyright_string: Copyright (c) Microsoft Corporation.
-description_string: QEMU Q35 SBSA RELEASE Platform Firmware
-name: Mu.QemuQ35SBSA.FW.RELEASE
+description_string: QEMU SBSA RELEASE Platform Firmware
+name: Mu.QemuSbsa.FW.RELEASE
 project_url: https://microsoft.github.io/mu/
 repository_type: git
 repository_url: https://github.com/microsoft/mu_tiano_platforms

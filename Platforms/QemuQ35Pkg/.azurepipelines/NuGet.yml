@@ -15,6 +15,12 @@ parameters:
   type: boolean
   default: true
 
+variables:
+  - name: raw_content_url
+    value: https://raw.githubusercontent.com
+  - name: org_repo
+    value: microsoft/mu_tiano_platforms
+
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms NuGet Release
 
 jobs:
@@ -26,7 +32,7 @@ jobs:
           QEMU Q35 Debug:
             artifact_name: Binaries QemuQ35Pkg DEBUG
             nuget_package_config_file: >-
-              https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
+              Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
             gcc_folder_name: GCC-x64
             gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
             vs_folder_name: VisualStudio-x64
@@ -35,7 +41,7 @@ jobs:
           QEMU Q35 Release:
             artifact_name: Binaries QemuQ35Pkg RELEASE
             nuget_package_config_file: >-
-              https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
+              Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
             gcc_folder_name: GCC-x64
             gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
             vs_folder_name: VisualStudio-x64
@@ -45,7 +51,7 @@ jobs:
           QEMU Q35 SBSA Debug:
             artifact_name: Binaries QemuSbsaPkg DEBUG
             nuget_package_config_file: >-
-              https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
+              Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
             gcc_folder_name: GCC-AARCH64
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
@@ -54,7 +60,7 @@ jobs:
           QEMU Q35 SBSA Release:
             artifact_name: Binaries QemuSbsaPkg RELEASE
             nuget_package_config_file: >-
-              https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml
+              Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml
             gcc_folder_name: GCC-AARCH64
             gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
             vs_folder_name: ''
@@ -79,7 +85,7 @@ jobs:
       displayName: Install edk2-pytool-extensions
 
     - script: |
-        curl -s https://api.github.com/repos/microsoft/mu_tiano_platforms/releases/latest --output release_response.json
+        curl -s https://api.github.com/repos/${ORG_REPO}/releases/latest --output release_response.json
         rawRepoVer=$(cat release_response.json | jq -r '.name')
         id=$(cat release_response.json | jq -r '.id')
         prefixToRemove="v"
@@ -90,25 +96,28 @@ jobs:
       displayName: Get Current Repo Release ID & Version
 
     - script: |
-        read type tagSha < <(echo $(curl -s "https://api.github.com/repos/microsoft/mu_tiano_platforms/git/ref/tags/$RAW_REPO_VERSION" | jq -r '.object.type,.object.sha'))
+        read type tagSha < <(echo $(curl -s "https://api.github.com/repos/${ORG_REPO}/git/ref/tags/$RAW_REPO_VERSION" | jq -r '.object.type,.object.sha'))
         if [ $type == "commit" ]; then
           echo "##vso[task.setvariable variable=repo_release_commit_sha;]${tagSha}"
         else
-          finalTagSha=$(curl -s "https://api.github.com/repos/microsoft/mu_tiano_platforms/git/tags/$tagSha" | jq '.object.sha')
+          finalTagSha=$(curl -s "https://api.github.com/repos/${ORG_REPO}/git/tags/$tagSha" | jq '.object.sha')
           echo "##vso[task.setvariable variable=repo_release_commit_sha;]${finalTagSha}"
         fi
       displayName: Get Current Release Commit Hash
 
     - script: |
-        curl https://raw.githubusercontent.com/microsoft/mu_tiano_platforms/main/License.txt --output $BUILD_ARTIFACTSTAGINGDIRECTORY/License.txt
+        licenseFileName="License.txt"
+        licenseFileUrl="${RAW_CONTENT_URL}/${ORG_REPO}/${RAW_REPO_VERSION}/${licenseFileName}"
+        curl $licenseFileUrl --output "${BUILD_ARTIFACTSTAGINGDIRECTORY}/${licenseFileName}"
       displayName: Download NuGet Package License File
 
     - script: |
-        curl $NUGET_PACKAGE_CONFIG_FILE --output $BUILD_ARTIFACTSTAGINGDIRECTORY/NugetConfigFile.txt
+        configFileUrl="${RAW_CONTENT_URL}/${ORG_REPO}/${RAW_REPO_VERSION}/${NUGET_PACKAGE_CONFIG_FILE}"
+        curl $configFileUrl --output "${BUILD_ARTIFACTSTAGINGDIRECTORY}/NugetConfigFile.txt"
       displayName: Download NuGet Package Config File
 
     - script: |
-        nugetPackageName=$(grep '^name:' $BUILD_ARTIFACTSTAGINGDIRECTORY/NugetConfigFile.txt | cut -d: -f2 | xargs)
+        nugetPackageName=$(grep '^name:' "${BUILD_ARTIFACTSTAGINGDIRECTORY}/NugetConfigFile.txt" | cut -d: -f2 | xargs)
         echo "##vso[task.setvariable variable=nuget_package_name;]${nugetPackageName}"
       displayName: Get NuGet Package Name
 
@@ -200,5 +209,5 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -H "Content-Type: application/octet-stream" \
-            "https://uploads.github.com/repos/microsoft/mu_tiano_platforms/releases/${REPO_RELEASE_ID}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
+            "https://uploads.github.com/repos/${ORG_REPO}/releases/${REPO_RELEASE_ID}/assets?name=${NUGET_PACKAGE_NAME}-${NUGET_PACKAGE_VERSION}.zip" \
             --data-binary "@${zipFolderPath}"

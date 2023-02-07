@@ -1,7 +1,7 @@
 ## @file
 # Azure Pipeline build file for building a platform.
 #
-# Platform: QemuQ35
+# Platform: Qemu SBSA
 # OS: Ubuntu
 # Toolchain: GCC
 #
@@ -11,6 +11,8 @@
 
 jobs:
   - job: SBSA_GCC
+    displayName: QemuSbsaPkg GCC
+
     variables:
       - group: architectures-arm64
       - group: tool-chain-ubuntu-gcc

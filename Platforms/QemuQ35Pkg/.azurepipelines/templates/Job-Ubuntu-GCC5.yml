@@ -11,6 +11,8 @@
 
 jobs:
   - job: Q35_GCC
+    displayName: QemuQ35Pkg GCC
+
     variables:
       - group: architectures-x86-64
       - group: tool-chain-ubuntu-gcc

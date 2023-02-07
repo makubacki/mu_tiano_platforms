@@ -11,6 +11,8 @@
 
 jobs:
   - job: Q35_VS
+    displayName: QemuQ35Pkg VS
+
     variables:
       - group: architectures-x86-64
       - group: tool-chain-windows-visual-studio-latest

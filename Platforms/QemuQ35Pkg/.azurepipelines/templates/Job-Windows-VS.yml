@@ -12,11 +12,14 @@
 jobs:
   - job: Q35_VS
     variables:
-    - group: architectures-x86-64
-    - group: tool-chain-windows-visual-studio-latest
-      package: 'QemuQ35Pkg'
-      should_run: true
-      run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+      - group: architectures-x86-64
+      - group: tool-chain-windows-visual-studio-latest
+      - name: package
+        value: QemuQ35Pkg
+      - name: should_run
+        value: true
+      - name: run_flags
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
 
     #Use matrix to speed up the build process
     strategy:

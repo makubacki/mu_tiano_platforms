@@ -12,11 +12,14 @@
 jobs:
   - job: SBSA_GCC
     variables:
-    - group: architectures-arm64
-    - group: tool-chain-ubuntu-gcc
-      package: 'QemuSbsaPkg'
-      should_run: true
-      run_flags: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
+      - group: architectures-arm64
+      - group: tool-chain-ubuntu-gcc
+      - name: package
+        value: QemuSbsaPkg
+      - name: should_run
+        value: true
+      - name: run_flags
+        value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE"
 
     # Use matrix to speed up the build process
     strategy:

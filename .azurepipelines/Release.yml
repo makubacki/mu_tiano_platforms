@@ -11,6 +11,14 @@
 trigger: none
 pr: none
 
+resources:
+  repositories:
+    - repository: mu_devops
+      type: github
+      endpoint: makubacki
+      name: makubacki/mu_devops
+      ref: test_nuget_publishing
+
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
 stages:

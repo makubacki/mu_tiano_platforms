@@ -1,5 +1,8 @@
 ## @file
-# Azure Pipeline build file for publishing a NuGet package.
+# Azure Pipeline build file for publishing release artifacts.
+#
+# Note: This file assumes it is run immediately after the release it applies to has been
+#       published (that release is the latest release).
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -15,56 +18,52 @@ parameters:
   type: boolean
   default: true
 
-variables:
-  - name: raw_content_url
-    value: https://raw.githubusercontent.com
-  - name: org_repo
-    value: microsoft/mu_tiano_platforms
-
-name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms NuGet Release
+name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Artifact Publishing
 
 jobs:
   - job: Publish
+
+    variables:
+      - name: raw_content_url
+        value: https://raw.githubusercontent.com
+      - name: org_repo
+        value: microsoft/mu_tiano_platforms
 
     strategy:
       matrix:
         ${{ if eq(parameters.publish_q35_binaries, true) }}:
           QEMU Q35 Debug:
-            artifact_name: Binaries QemuQ35Pkg DEBUG
+            gcc_artifact_name: 'QemuQ35Pkg GCC5 DEBUG'
+            gcc_folder_name: GCC-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
-            gcc_folder_name: GCC-x64
-            gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
+            vs_artifact_name: 'QemuQ35Pkg VS2022 DEBUG'
             vs_folder_name: VisualStudio-x64
-            vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
           QEMU Q35 Release:
-            artifact_name: Binaries QemuQ35Pkg RELEASE
+            gcc_artifact_name: 'QemuQ35Pkg GCC5 RELEASE'
+            gcc_folder_name: GCC-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
-            gcc_folder_name: GCC-x64
-            gcc_pipeline_name: Mu Tiano Platforms Q35 Plat CI GCC5
+            vs_artifact_name: 'QemuQ35Pkg VS2022 RELEASE'
             vs_folder_name: VisualStudio-x64
-            vs_pipeline_name: Mu Tiano Platforms Q35 Plat CI VS
 
         ${{ if eq(parameters.publish_sbsa_binaries, true) }}:
           QEMU SBSA Debug:
-            artifact_name: Binaries QemuSbsaPkg DEBUG
+            gcc_artifact_name: 'QemuSbsaPkg GCC5 DEBUG'
+            gcc_folder_name: GCC-AARCH64
             nuget_package_config_file: >-
               Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
-            gcc_folder_name: GCC-AARCH64
-            gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
+            vs_artifact_name: ''
             vs_folder_name: ''
-            vs_pipeline_name: ''
 
           QEMU SBSA Release:
-            artifact_name: Binaries QemuSbsaPkg RELEASE
+            gcc_artifact_name: 'QemuSbsaPkg GCC5 RELEASE'
+            gcc_folder_name: GCC-AARCH64
             nuget_package_config_file: >-
               Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml
-            gcc_folder_name: GCC-AARCH64
-            gcc_pipeline_name: Mu Tiano Platforms SBSA Plat CI GCC5
+            vs_artifact_name: ''
             vs_folder_name: ''
-            vs_pipeline_name: ''
 
     workspace:
       clean: all
@@ -121,19 +120,14 @@ jobs:
         echo "##vso[task.setvariable variable=nuget_package_name;]${nugetPackageName}"
       displayName: Get NuGet Package Name
 
-    - task: DownloadBuildArtifacts@0
-      name: DownloadGccBuildArtifacts
-      displayName: Download GCC Build Artifacts
+    - task: DownloadPipelineArtifact@2
+      name: DownloadGccArtifacts
+      displayName: Download GCC Artifacts
       inputs:
-        buildType: 'specific'
-        project: $(System.TeamProject)
-        pipeline: $(gcc_pipeline_name)
-        specificBuildWithTriggering: true
-        buildVersionToDownload: 'latest'
-        downloadType: 'single'
-        artifactName: $(artifact_name)
-        downloadPath: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
-      condition: and(ne(variables.gcc_folder_name, ''), ne(variables.gcc_pipeline_name, ''))
+        buildType: 'current'
+        artifactName: $(gcc_artifact_name)
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
+      condition: and(ne(variables.gcc_artifact_name, ''), ne(variables.gcc_folder_name, ''))
 
     - task: CopyFiles@2
       displayName: Copy GCC Binaries
@@ -142,21 +136,16 @@ jobs:
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(gcc_folder_name)'
         contents: '**'
         flattenFolders: true
-      condition: and(ne(variables.gcc_folder_name, ''), ne(variables.gcc_pipeline_name, ''))
+      condition: and(ne(variables.gcc_artifact_name, ''), ne(variables.gcc_folder_name, ''))
 
-    - task: DownloadBuildArtifacts@0
-      name: DownloadVisualStudioBuildArtifacts
-      displayName: Download Visual Studio Build Artifacts
+    - task: DownloadPipelineArtifact@2
+      name: DownloadVisualStudioArtifacts
+      displayName: Download Visual Studio Artifacts
       inputs:
-        buildType: 'specific'
-        project: $(System.TeamProject)
-        pipeline: $(vs_pipeline_name)
-        specificBuildWithTriggering: true
-        buildVersionToDownload: 'latest'
-        downloadType: 'single'
-        artifactName: $(artifact_name)
-        downloadPath: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
-      condition: and(ne(variables.vs_folder_name, ''), ne(variables.vs_pipeline_name, ''))
+        buildType: 'current'
+        artifactName: $(vs_artifact_name)
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
+      condition: and(ne(variables.vs_artifact_name, ''), ne(variables.vs_folder_name, ''))
 
     - task: CopyFiles@2
       displayName: Copy Visual Studio Binaries
@@ -165,7 +154,7 @@ jobs:
         sourceFolder: '$(Build.ArtifactStagingDirectory)/$(vs_folder_name)'
         contents: '**'
         flattenFolders: true
-      condition: and(ne(variables.vs_folder_name, ''), ne(variables.vs_pipeline_name, ''))
+      condition: and(ne(variables.vs_artifact_name, ''), ne(variables.vs_folder_name, ''))
 
     - task: Bash@3
       name: PackAndPublishNugetPackage

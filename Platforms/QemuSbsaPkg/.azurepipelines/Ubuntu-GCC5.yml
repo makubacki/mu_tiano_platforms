@@ -81,7 +81,7 @@ jobs:
           - script: sudo dnf --assumeyes install openssl-devel
             displayName: Install openssl
             condition: and(gt(variables.pkg_count, 0), succeeded())
-        artifacts_identifier: '$(package) $(Build.Target)'
+        artifacts_identifier: '$(package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: |
           **/QEMU_EFI.fd
           **/SECURE_FLASH0.fd

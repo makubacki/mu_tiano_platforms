@@ -77,6 +77,6 @@ jobs:
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
         install_tools: false
-        artifacts_identifier: '$(package) $(Build.Target)'
+        artifacts_identifier: '$(package) $(tool_chain_tag) $(Build.Target)'
         artifacts_binary: |
           **/QEMUQ35_*.fd

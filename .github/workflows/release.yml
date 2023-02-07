@@ -1,10 +1,11 @@
-# This workflow publishes a NuGet package on a release in the repo.
+# This workflow performs release work for this repo after a
+# release is published on GitHub.
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-name: Publish NuGet Package on Release
+name: Create Repo Release
 
 on:
   release:

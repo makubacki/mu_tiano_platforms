@@ -31,24 +31,24 @@ jobs:
       matrix:
         ${{ if eq(parameters.publish_q35_binaries, true) }}:
           QEMU Q35 Debug:
-            gcc_artifact_name: 'QemuQ35Pkg GCC5 DEBUG'
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 DEBUG'
             gcc_folder_name: GCC-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/DebugConfig.yaml
-            vs_artifact_name: 'QemuQ35Pkg VS2022 DEBUG'
+            vs_artifact_name: 'Binaries QemuQ35Pkg VS2022 DEBUG'
             vs_folder_name: VisualStudio-x64
 
           QEMU Q35 Release:
-            gcc_artifact_name: 'QemuQ35Pkg GCC5 RELEASE'
+            gcc_artifact_name: 'Binaries QemuQ35Pkg GCC5 RELEASE'
             gcc_folder_name: GCC-x64
             nuget_package_config_file: >-
               Platforms/QemuQ35Pkg/NugetPublishing/ReleaseConfig.yaml
-            vs_artifact_name: 'QemuQ35Pkg VS2022 RELEASE'
+            vs_artifact_name: 'Binaries QemuQ35Pkg VS2022 RELEASE'
             vs_folder_name: VisualStudio-x64
 
         ${{ if eq(parameters.publish_sbsa_binaries, true) }}:
           QEMU SBSA Debug:
-            gcc_artifact_name: 'QemuSbsaPkg GCC5 DEBUG'
+            gcc_artifact_name: 'Binaries QemuSbsaPkg GCC5 DEBUG'
             gcc_folder_name: GCC-AARCH64
             nuget_package_config_file: >-
               Platforms/QemuSbsaPkg/NugetPublishing/DebugConfig.yaml
@@ -56,7 +56,7 @@ jobs:
             vs_folder_name: ''
 
           QEMU SBSA Release:
-            gcc_artifact_name: 'QemuSbsaPkg GCC5 RELEASE'
+            gcc_artifact_name: 'Binaries QemuSbsaPkg GCC5 RELEASE'
             gcc_folder_name: GCC-AARCH64
             nuget_package_config_file: >-
               Platforms/QemuSbsaPkg/NugetPublishing/ReleaseConfig.yaml

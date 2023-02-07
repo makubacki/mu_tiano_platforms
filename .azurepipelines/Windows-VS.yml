@@ -15,9 +15,9 @@ resources:
   repositories:
     - repository: mu_devops
       type: github
-      endpoint: microsoft
-      name: microsoft/mu_devops
-      ref: refs/tags/v2.0.1
+      endpoint: makubacki
+      name: makubacki/mu_devops
+      ref: test_nuget_publishing
 
 variables:
 - group: architectures-x86-64

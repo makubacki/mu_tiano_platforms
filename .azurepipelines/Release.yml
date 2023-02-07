@@ -15,15 +15,18 @@ name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
 stages:
 - stage: Build QEMU Q35
+  jobs:
   - template: ../Platforms/QemuQ35Pkg/.azurepipelines/Ubuntu-GCC5.yml
   - template: ../Platforms/QemuQ35Pkg/.azurepipelines/Windows-VS.yml
 
 - stage: Build QEMU SBSA
   dependsOn: [] # Build in parallel with the previous stage
+  jobs:
   - template: ../Platforms/QemuSbsaPkg/.azurepipelines/Ubuntu-GCC5.yml
 
 - stage: Publish Release Artifacts
   dependsOn:
   - Build QEMU Q35
   - Build QEMU SBSA
+  jobs:
   - template: Publish.yml

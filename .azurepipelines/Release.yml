@@ -37,4 +37,4 @@ stages:
   - Build QEMU Q35
   - Build QEMU SBSA
   jobs:
-  - template: Publish.yml
+    - template: templates/Job-Publish.yml

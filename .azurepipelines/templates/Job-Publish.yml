@@ -18,8 +18,6 @@ parameters:
   type: boolean
   default: true
 
-name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Artifact Publishing
-
 jobs:
   - job: Publish
 

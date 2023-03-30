@@ -17,27 +17,20 @@ resources:
       type: github
       endpoint: microsoft
       name: microsoft/mu_devops
-      ref: refs/tags/v2.0.1
+      ref: refs/tags/v2.3.0
 
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
 stages:
-- stage: BuildQemuQ35
-  displayName: Build QEMU Q35
+- stage: BuildQemuPlatforms
+  displayName: Build QEMU Platforms
   jobs:
-    - template: ../Platforms/QemuQ35Pkg/.azurepipelines/templates/Job-Ubuntu-GCC5.yml
-    - template: ../Platforms/QemuQ35Pkg/.azurepipelines/templates/Job-Windows-VS.yml
-
-- stage: BuildQemuSbsa
-  displayName: Build QEMU SBSA
-  dependsOn: [] # Build in parallel with the previous stage
-  jobs:
-    - template: ../Platforms/QemuSbsaPkg/.azurepipelines/templates/Job-Ubuntu-GCC5.yml
+    - template: .azurepipelines/Platform-Build-GCC5.yml
+    - template: .azurepipelines/Platform-Build-VS.yml
 
 - stage: PublishReleaseArtifacts
   displayName: Publish Release Artifacts
   dependsOn:
-  - BuildQemuQ35
-  - BuildQemuSbsa
+  - BuildQemuPlatforms
   jobs:
     - template: templates/Job-Publish.yml

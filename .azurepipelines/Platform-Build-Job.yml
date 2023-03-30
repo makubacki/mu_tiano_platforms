@@ -118,7 +118,7 @@ jobs:
         displayName: Install mtools and dosfstools
     - template: Steps/BuildPlatform.yml@mu_devops
       parameters:
-        tool_chain_tag: $(tool_chain_tag)
+        tool_chain_tag: ${{ parameters.tool_chain_tag }}
         build_pkg: $(Build.Package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)

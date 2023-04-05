@@ -25,8 +25,8 @@ stages:
 - stage: BuildQemuPlatforms
   displayName: Build QEMU Platforms
   jobs:
-    - template: .azurepipelines/Platform-Build-GCC5.yml
-    - template: .azurepipelines/Platform-Build-VS.yml
+    - template: templates/Job-Gcc-Platform.yml
+    - template: templates/Job-VisualStudio-Platform.yml
 
 - stage: PublishReleaseArtifacts
   displayName: Publish Release Artifacts

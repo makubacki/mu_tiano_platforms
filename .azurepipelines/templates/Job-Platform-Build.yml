@@ -29,6 +29,10 @@ jobs:
     displayName: Build Platforms
 
     variables:
+      - ${{ if contains(parameters.tool_chain_tag, 'VS') }}:
+        - group: tool-chain-windows-visual-studio-latest
+      - ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
+        - group: tool-chain-ubuntu-gcc
       - name: run_flags
         value: "SHUTDOWN_AFTER_RUN=TRUE QEMU_HEADLESS=TRUE EMPTY_DRIVE=TRUE TEST_REGEX=*TestApp.efi RUN_TESTS=TRUE"
 

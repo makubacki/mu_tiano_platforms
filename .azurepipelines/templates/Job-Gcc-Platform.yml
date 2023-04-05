@@ -1,14 +1,13 @@
-resources:
-  containers:
-    - container: linux-gcc
-      image: ghcr.io/tianocore/containers/fedora-37-test:54e5bd1
-
 jobs:
-- template: Job-Platform-Build.yml
-  parameters:
-    tool_chain_tag: 'GCC5'
-    vm_image: $(vm_image)
-    container_image: linux-gcc
-    extra_install_step:
-          - script: sudo dnf --assumeyes install openssl-devel
-            displayName: Install openssl
+  containers:
+  - container: linux-gcc
+    image: ghcr.io/tianocore/containers/fedora-37-test:54e5bd1
+
+  - template: Job-Platform-Build.yml
+    parameters:
+      tool_chain_tag: 'GCC5'
+      vm_image: $(vm_image)
+      container_image: linux-gcc
+      extra_install_step:
+            - script: sudo dnf --assumeyes install openssl-devel
+              displayName: Install openssl

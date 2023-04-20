@@ -1,0 +1,22 @@
+name: Update Submodules to Latest Release
+
+on:
+  # schedule:
+  #   - cron: '0 0 * * MON'  # https://crontab.guru/every-monday
+  workflow_dispatch:
+
+jobs:
+  repo_submodule_update:
+    name: Check for Submodule Releases
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout submodules non-recursively at depth of 1 to check whether
+      # an update is needed.
+      - name: Update Submodules to Latest Release
+        uses: makubacki/mu_devops/.github/actions/submodule-release-updater@add_submodule_release_updater_action
+        with:
+          GH_PAT: ${{ secrets.SUBMODULE_UPDATER_TOKEN }}
+          GH_USER: "ProjectMuBot"
+          GIT_EMAIL: "mubot@microsoft.com"
+          GIT_NAME: "Project Mu Bot"

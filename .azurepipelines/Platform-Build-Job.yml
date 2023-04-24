@@ -128,5 +128,5 @@ jobs:
         run_timeout: 25
         extra_install_step: ${{ parameters.extra_install_step }}
         install_tools: ${{ eq(parameters.container_image, '') }}
-        artifacts_identifier: '$(Build.Package) $(tool_chain_tag) $(Build.Target) $(Build.ExtraTag)'
+        artifacts_identifier: '$(Build.Package) ${{ parameters.tool_chain_tag }} $(Build.Target) $(Build.ExtraTag)'
         artifacts_binary: $(Build.ArtifactsBinary)

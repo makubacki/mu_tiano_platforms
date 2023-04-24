@@ -30,7 +30,7 @@ stages:
           extra_install_step:
                 - script: sudo dnf --assumeyes install openssl-devel
                   displayName: Install openssl
-          container_image: linux-gcc
+          container_image: ghcr.io/tianocore/containers/fedora-37-test:54e5bd1
           tool_chain_tag: GCC5
           vm_image: ubuntu-latest
 

@@ -1,0 +1,9 @@
+author_string: Microsoft Core UEFI
+copyright_string: Copyright (c) Microsoft Corporation.
+description_string: QEMU Q35 No SMM RELEASE Platform Firmware
+name: TEST.Mu.QemuQ35.NoSmm.FW.RELEASE
+project_url: https://microsoft.github.io/mu/
+repository_type: git
+repository_url: https://github.com/makubacki/mu_tiano_platforms
+server_url: https://nuget.pkg.github.com/makubacki/index.json
+tags_string: ''

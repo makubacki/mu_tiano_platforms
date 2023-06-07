@@ -32,7 +32,7 @@ stages:
         os_type: Linux
         container_image: linux-gcc
         build_matrix:
-          QemuQ35_DEBUG:
+          QemuQ35_GCC_DEBUG:
             BuildPackage: QemuQ35Pkg
             BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
             BuildArch: IA32,X64
@@ -47,7 +47,7 @@ stages:
               **/QEMUQ35_*.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuQ35_RELEASE:
+          QemuQ35_GCC_RELEASE:
             BuildPackage: QemuQ35Pkg
             BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
             BuildArch: IA32,X64
@@ -62,7 +62,7 @@ stages:
               **/QEMUQ35_*.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuQ35_NO_SMM_RELEASE:
+          QemuQ35_GCC_NO_SMM_RELEASE:
             BuildPackage: QemuQ35Pkg
             BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
             BuildArch: IA32,X64
@@ -77,7 +77,7 @@ stages:
               **/QEMUQ35_*.fd
             BuildArtifactsOther: ""
 
-          QemuSbsa_DEBUG:
+          QemuSbsa_GCC_DEBUG:
             BuildPackage: QemuSbsaPkg
             BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
             BuildArch: AARCH64
@@ -94,7 +94,7 @@ stages:
               **/SECURE_FLASH0.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuSbsa_RELEASE:
+          QemuSbsa_GCC_RELEASE:
             BuildPackage: QemuSbsaPkg
             BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
             BuildArch: AARCH64
@@ -121,7 +121,7 @@ stages:
         vm_image: windows-latest
         os_type: Windows_NT
         build_matrix:
-          QemuQ35_DEBUG:
+          QemuQ35_VS_DEBUG:
             BuildPackage: QemuQ35Pkg
             BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
             BuildArch: IA32,X64
@@ -136,7 +136,7 @@ stages:
               **/QEMUQ35_*.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuQ35_RELEASE:
+          QemuQ35_VS_RELEASE:
             BuildPackage: QemuQ35Pkg
             BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
             BuildArch: IA32,X64
@@ -151,7 +151,7 @@ stages:
               **/QEMUQ35_*.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuQ35_NO_SMM_RELEASE:
+          QemuQ35_VS_NO_SMM_RELEASE:
             BuildPackage: QemuQ35Pkg
             BuildFile: "Platforms/QemuQ35Pkg/PlatformBuild.py"
             BuildArch: IA32,X64

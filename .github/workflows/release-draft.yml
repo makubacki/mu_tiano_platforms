@@ -23,7 +23,7 @@ name: Update Release Draft
 on:
   push:
     branches:
-      - main
+      - update_release_pipeline_for_selfhosted_agent_change
 
 jobs:
   draft:

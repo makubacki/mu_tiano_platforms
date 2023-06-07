@@ -30,7 +30,7 @@ stages:
         tool_chain_tag: 'GCC5'
         vm_image: ubuntu-latest
         os_type: Linux
-        container_image: linux-gcc
+        container_image: ghcr.io/tianocore/containers/fedora-37-test:latest
         build_matrix:
           QemuQ35_GCC_DEBUG:
             BuildPackage: QemuQ35Pkg

@@ -22,8 +22,12 @@ resources:
 name: $(Date:yyyyMMdd)$(Rev:.r) Mu Tiano Platforms Release
 
 stages:
-- stage: BuildQemuPlatforms
-  displayName: Build QEMU Platforms
+- stage: LinuxBuildQemuPlatforms
+  displayName: Build QEMU Platforms on Linux
+
+  variables:
+  - group: tool-chain-ubuntu-gcc
+
   jobs:
     - template: Platform-Build-Job.yml
       parameters:
@@ -111,6 +115,13 @@ stages:
               **/SECURE_FLASH0.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
+- stage: WindowsBuildQemuPlatforms
+  displayName: Build QEMU Platforms on Windows
+
+  variables:
+  - group: tool-chain-windows-visual-studio-latest
+
+  jobs:
     - template: Platform-Build-Job.yml
       parameters:
         extra_install_step:
@@ -169,6 +180,7 @@ stages:
 - stage: PublishReleaseArtifacts
   displayName: Publish Release Artifacts
   dependsOn:
-  - BuildQemuPlatforms
+  - LinuxBuildQemuPlatforms
+  - WindowsBuildQemuPlatforms
   jobs:
     - template: templates/Job-Publish.yml

@@ -117,6 +117,7 @@ stages:
 
 - stage: WindowsBuildQemuPlatforms
   displayName: Build QEMU Platforms on Windows
+  dependsOn: []
 
   variables:
   - group: tool-chain-windows-visual-studio-latest

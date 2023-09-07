@@ -6,12 +6,15 @@
 ##
 import os
 import logging
+import io
+import shutil
 import glob
 import datetime
-import sys
+import xml.etree.ElementTree
+import tempfile
 import uuid
+import string
 
-from edk2toolext import codeql as codeql_helpers
 from edk2toolext.environment import shell_environment
 from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
@@ -23,8 +26,6 @@ from typing import Tuple
 from pathlib import Path
 from io import StringIO
 
-WORKSPACE_ROOT = Path(__file__).parent.parent.parent.resolve()
-
 # Declare test whose failure will not return a non-zero exit code
 FAILURE_EXEMPT_TESTS = {
     "VariablePolicyFuncTestApp.efi": datetime.datetime(2023, 7, 20, 0, 0, 0),
@@ -33,10 +34,9 @@ FAILURE_EXEMPT_TESTS = {
 # Allow failure exempt tests to be ignored for 90 days
 FAILURE_EXEMPT_OMISSION_LENGTH = 90*24*60*60
 
-
-# ####################################################################################### #
-#                                Common Configuration                                     #
-# ####################################################################################### #
+    # ####################################################################################### #
+    #                                Common Configuration                                     #
+    # ####################################################################################### #
 class CommonPlatform():
     ''' Common settings for this platform.  Define static data here and use
         for the different parts of stuart
@@ -45,6 +45,7 @@ class CommonPlatform():
     ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('qemu', 'qemuq35', 'edk2-build', 'cibuild', 'configdata')
+    WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     PackagesPath = (
         "Platforms",
         "MU_BASECORE",
@@ -59,27 +60,27 @@ class CommonPlatform():
     @staticmethod
     def add_common_command_line_options(parserObj) -> None:
         """Adds command line options common to settings managers."""
-        codeql_helpers.add_command_line_option(parserObj)
+        parserObj.add_argument('--codeql', dest='codeql', action='store_true', default=False,
+            help="Optional - Produces CodeQL results from the build. See "
+                 "MU_BASECORE/.pytool/Plugin/CodeQL/Readme.md for more information.")
 
     @staticmethod
-    def is_codeql_enabled(args) -> bool:
-        """Retrieves whether CodeQL is enabled."""
-        return codeql_helpers.is_codeql_enabled_on_command_line(args)
+    def retrieve_common_command_line_options(args) -> bool:
+        """Retrieves command line options common to settings managers."""
+        return args.codeql
 
     @staticmethod
     def get_active_scopes(codeql_enabled: bool) -> Tuple[str]:
         """Returns the active scopes for the platform."""
         active_scopes = CommonPlatform.Scopes
-        active_scopes += codeql_helpers.get_scopes(codeql_enabled)
 
+        # Enable the CodeQL plugin if chosen on command line
         if codeql_enabled:
-            codeql_filter_files = [str(n) for n in glob.glob(
-                os.path.join(WORKSPACE_ROOT,
-                                '**/CodeQlFilters.yml'), recursive=True)]
-            shell_environment.GetBuildVars().SetValue(
-                "STUART_CODEQL_FILTER_FILES",
-                ','.join(codeql_filter_files),
-                "Set in CISettings.py")
+            if GetHostInfo().os == "Linux":
+                active_scopes += ("codeql-linux-ext-dep",)
+            else:
+                active_scopes += ("codeql-windows-ext-dep",)
+            active_scopes += ("codeql-build", "codeql-analyze")
 
         return active_scopes
 
@@ -94,7 +95,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def RetrieveCommandLineOptions(self, args):
         """Retrieve command line options from the argparser"""
-        self.codeql = CommonPlatform.is_codeql_enabled(args)
+        self.codeql = CommonPlatform.retrieve_common_command_line_options(args)
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -142,7 +143,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
-        return str(WORKSPACE_ROOT)
+        return CommonPlatform.WorkspaceRoot
 
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
@@ -207,11 +208,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if args.build_arch.upper() != "IA32,X64":
             raise Exception("Invalid Arch Specified.  Please see comments in PlatformBuild.py::PlatformBuilder::AddCommandLineOptions")
 
-        self.codeql = CommonPlatform.is_codeql_enabled(args)
+        self.codeql = CommonPlatform.retrieve_common_command_line_options(args)
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
-        return str(WORKSPACE_ROOT)
+        return CommonPlatform.WorkspaceRoot
 
     def GetPackagesPath(self):
         ''' Return a list of workspace relative paths that should be mapped as edk2 PackagesPath '''
@@ -268,6 +269,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         self.env.SetValue("BLD_*_SHIP_MODE", "FALSE", "Default")
         self.env.SetValue("CONF_AUTOGEN_INCLUDE_PATH", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
 
+        self.env.SetValue("YAML_POLICY_FILE", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "PolicyData", "PolicyDataUsb.yaml"), "Platform Hardcoded")
+        self.env.SetValue("POLICY_DATA_STRUCT_FOLDER", self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "Include"), "Platform Defined")
+        self.env.SetValue('POLICY_REPORT_FOLDER', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "PolicyData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_DIR', self.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath("QemuQ35Pkg", "CfgData"), "Platform Defined")
         self.env.SetValue('MU_SCHEMA_FILE_NAME', "QemuQ35PkgCfgData.xml", "Platform Hardcoded")
         self.env.SetValue('CONF_PROFILE_PATHS',

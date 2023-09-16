@@ -24,10 +24,12 @@ on:
     branches:
       - main
       - release/*
+      - update_codeql_action
   pull_request:
     branches:
       - main
       - release/*
+      - update_codeql_action
     paths-ignore:
       - '!**.c'
       - '!**.h'

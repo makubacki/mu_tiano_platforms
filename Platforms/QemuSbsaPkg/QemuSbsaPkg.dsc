@@ -83,8 +83,10 @@
   PEI_CRYPTO_SERVICES           = TINY_SHA
   DXE_CRYPTO_SERVICES           = STANDARD
   STANDALONEMM_CRYPTO_SERVICES  = STANDARD
+  SMM_CRYPTO_SERVICES           = STANDARD
   PEI_CRYPTO_ARCH               = AARCH64
   DXE_CRYPTO_ARCH               = AARCH64
+  SMM_CRYPTO_ARCH               = AARCH64
   STANDALONEMM_CRYPTO_ARCH      = AARCH64
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
@@ -890,6 +892,8 @@
 #
 ################################################################################
 [Components.common]
+  !include CryptoPkg/Driver/Bin/CryptoDriver.inc.dsc
+
   #
   # PEI Phase modules
   #

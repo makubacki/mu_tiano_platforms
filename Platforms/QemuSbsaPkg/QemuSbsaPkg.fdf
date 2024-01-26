@@ -410,6 +410,9 @@ READ_LOCK_STATUS   = TRUE
   INF  MsCorePkg/HelloWorldRustDxe/HelloWorldRustDxe.inf
   INF  AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
+  #!include CryptoPkg/Driver/Bin/CryptoDriver.DXE.inc.fdf
+  #!include CryptoPkg/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
+
   #
   # DFCI support
   #
@@ -491,6 +494,9 @@ READ_LOCK_STATUS   = TRUE
   INF MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
   INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
   INF OemPkg/DeviceStatePei/DeviceStatePei.inf
+
+  #!include CryptoPkg/Driver/Bin/CryptoDriver.PEI.inc.fdf
+
   INF MfciPkg/MfciPei/MfciPei.inf
 
   INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf

@@ -482,21 +482,23 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf
   INF ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
+  !include CryptoPkg/Driver/Bin/CryptoDriver.PEI.inc.fdf
   INF ArmPkg/Drivers/SmmVariablePei/SmmVariablePei.inf
   INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
-  INF MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
-  INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-  INF MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
-  INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
+  # Temporarily remove PEIMs to keep FV the same size with PeiCrypto added
+  #INF MsGraphicsPkg/MsUiTheme/Pei/MsUiThemePpi.inf
+  #INF MsGraphicsPkg/MsEarlyGraphics/Pei/MsEarlyGraphics.inf
+  #INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  #INF MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf
+  #INF MsWheaPkg/MsWheaReport/Pei/MsWheaReportPei.inf
   INF OemPkg/DeviceStatePei/DeviceStatePei.inf
-  INF MfciPkg/MfciPei/MfciPei.inf
+  #INF MfciPkg/MfciPei/MfciPei.inf
 
-  INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
+  #INF  PolicyServicePkg/PolicyService/Pei/PolicyPei.inf
 
-  INF  QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
-  INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
+  #INF  QemuSbsaPkg/ConfigKnobs/ConfigKnobs.inf
+  #INF  OemPkg/OemConfigPolicyCreatorPei/OemConfigPolicyCreatorPei.inf
 
 !if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
@@ -529,6 +531,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
   INF StandaloneMmPkg/Core/StandaloneMmCore.inf
+  !include CryptoPkg/Driver/Bin/CryptoDriver.STANDALONEMM.inc.fdf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
   INF QemuSbsaPkg/VirtNorFlashStandaloneMm/VirtNorFlashStandaloneMm.inf
@@ -573,6 +576,22 @@ READ_LOCK_STATUS   = TRUE
   FILE MM_STANDALONE = $(NAMED_GUID) {
     SMM_DEPEX SMM_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
     PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.PEIM.BINARY]
+  FILE PEIM = $(NAMED_GUID) {
+    PEI_DEPEX PEI_DEPEX Optional      |.depex
+    PE32      PE32     Align = Auto   |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.MM_STANDALONE.BINARY]
+  FILE MM_STANDALONE = $(NAMED_GUID) {
+    SMM_DEPEX SMM_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
     UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }

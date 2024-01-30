@@ -24,6 +24,15 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = QemuSbsaPkg/QemuSbsaPkg.fdf
 
+  PEI_CRYPTO_SERVICES           = STANDARD
+  DXE_CRYPTO_SERVICES           = STANDARD
+  STANDALONEMM_CRYPTO_SERVICES  = STANDARD
+  SMM_CRYPTO_SERVICES           = STANDARD
+  PEI_CRYPTO_ARCH               = AARCH64
+  DXE_CRYPTO_ARCH               = AARCH64
+  SMM_CRYPTO_ARCH               = AARCH64
+  STANDALONEMM_CRYPTO_ARCH      = AARCH64
+
   #  DEBUG_INIT      0x00000001  // Initialization
   #  DEBUG_WARN      0x00000002  // Warnings
   #  DEBUG_LOAD      0x00000004  // Load events
@@ -89,6 +98,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -137,9 +147,6 @@
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-!endif
 
   NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
 
@@ -201,16 +208,6 @@
   # USB Libraries
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
-  #
-  # CryptoPkg libraries needed by multiple firmware features
-  #
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
-!else
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
-!endif
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
@@ -437,7 +434,6 @@
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
 
@@ -472,10 +468,6 @@
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
   ResetSystemLib|MdeModulePkg/Library/RuntimeResetSystemLib/RuntimeResetSystemLib.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-!endif
-
 [LibraryClasses.common.MM_CORE_STANDALONE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
@@ -495,9 +487,6 @@
   HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
@@ -552,6 +541,12 @@
   # Current support of advanced logger in Standalone MM is limited to the platforms
   # that supports it from TFA.
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+
+[LibraryClasses.AARCH64.PEIM]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+
+[LibraryClasses.AARCH64.MM_STANDALONE]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/StandaloneMmCryptLib.inf
 
 [BuildOptions]
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
@@ -1223,16 +1218,6 @@
 !if $(BUILD_UNIT_TESTS) == TRUE
 
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
-    <LibraryClasses>
-      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf # Contains openSSL library used by BaseCryptoLib
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-    <PcdsPatchableInModule>
-      #Turn off Halt on Assert and Print Assert so that libraries can
-      #be tested in more of a release mode environment
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0E
-  }
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestApp.inf
@@ -1362,12 +1347,12 @@
   #
   StandaloneMmPkg/Core/StandaloneMmCore.inf {
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800000C1
   }
 
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf {
     <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800000C1
   }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf {

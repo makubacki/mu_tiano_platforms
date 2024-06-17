@@ -406,8 +406,8 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   FrameBufferMemDrawLib|MsGraphicsPkg/Library/FrameBufferMemDrawLib/FrameBufferMemDrawLibPei.inf
-
   PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -433,6 +433,7 @@
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
+  RngLib                     |MdePkg/Library/PeiRngLib/PeiRngLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
@@ -446,6 +447,7 @@
   PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
   MemoryBinOverrideLib|MdeModulePkg/Library/MemoryBinOverrideLibNull/MemoryBinOverrideLibNull.inf
   DebugAgentLib|DebuggerFeaturePkg/Library/DebugAgent/DebugAgentDxe.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
@@ -947,6 +949,11 @@
   }
 !endif
 
+  SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf {
+    <LibraryClasses>
+      RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  }
+
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   MsCorePkg/Core/GuidedSectionExtractPeim/GuidedSectionExtract.inf {
     <LibraryClasses>
@@ -1033,7 +1040,10 @@
   QemuPkg/VirtioRngDxe/VirtioRng.inf
 
   # Rng Protocol producer
-  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf {
+    <LibraryClasses>
+      RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  }
 
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs

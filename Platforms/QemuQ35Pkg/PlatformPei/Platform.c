@@ -30,6 +30,7 @@
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/ResourcePublicationLib.h>
+#include <Library/RngLib.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Microvm.h>
@@ -820,6 +821,7 @@ InitializePlatform (
 {
   EFI_STATUS  Status;
   // MU_CHANGE START
+  UINT16      RandomNumber;
   DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
   MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
@@ -835,6 +837,12 @@ InitializePlatform (
     DxeSettings.ImageProtectionPolicy.Fields.BlockImagesWithoutNxFlag = 0;
  #endif
 
+  if (GetRandomNumber16 (&RandomNumber)) {
+    DEBUG ((DEBUG_INFO, "[%a] - The random number is %d.\n", __func__, RandomNumber));
+  }
+  if (GetRandomNumber16 (&RandomNumber)) {
+    DEBUG ((DEBUG_INFO, "[%a] - The random number is %d.\n", __func__, RandomNumber));
+  }
     BuildGuidDataHob (
       &gDxeMemoryProtectionSettingsGuid,
       &DxeSettings,

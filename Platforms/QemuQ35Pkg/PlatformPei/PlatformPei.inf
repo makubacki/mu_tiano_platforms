@@ -68,6 +68,7 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
+  RngLib
 
 [Pcd]
   gUefiQemuQ35PkgTokenSpaceGuid.PcdOvmfPeiMemFvBase

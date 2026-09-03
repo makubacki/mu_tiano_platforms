@@ -42,7 +42,7 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
         ''' return iterable of edk2 packages supported by this build.
         These should be edk2 workspace relative paths '''
 
-        return ("QemuPkg", "QemuQ35Pkg","QemuSbsaPkg")
+        return ("QemuPkg", "QemuQ35Pkg","QemuArmVirtPkg")
 
     def GetArchitecturesSupported(self):
         ''' return iterable of edk2 architectures supported by this build '''
@@ -142,7 +142,7 @@ class Settings(CiSetupSettingsManager, CiBuildSettingsManager, UpdateSettingsMan
             if "mu_" in submodule.url:
                 rs.append(RequiredSubmodule(submodule.path, False, ".pytool/CISettings.py"))
             else:
-                rs.append(RequiredSubmodule(submodule.path, True))
+                rs.append(RequiredSubmodule(submodule.path, False))
         return rs
 
     def GetName(self):

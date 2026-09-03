@@ -30,8 +30,8 @@
 !ifndef DXE_DBG_BRK
   DEFINE DXE_DBG_BRK = FALSE
 !endif
-!ifndef TPM_ENABLE
-  DEFINE TPM_ENABLE                     = FALSE
+!ifndef TPM2_ENABLE
+  DEFINE TPM2_ENABLE                    = FALSE
 !endif
   DEFINE TPM_CONFIG_ENABLE              = FALSE
   DEFINE OPT_INTO_MFCI_PRE_PRODUCTION   = TRUE
@@ -46,14 +46,14 @@
   DEFINE CUSTOM_STACK_CHECK_LIB         = DYNAMIC
 
   PEI_CRYPTO_SERVICES = TINY_SHA
-  DXE_CRYPTO_SERVICES = STANDARD
+  DXE_CRYPTO_SERVICES = NONE
   SMM_CRYPTO_SERVICES = NONE
   STANDALONEMM_CRYPTO_SERVICES = NONE
-  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = STANDARD
-  DXE_CRYPTO_ARCH = X64
+  STANDALONEMM_MMSUPV_CRYPTO_SERVICES = NONE
+  DXE_CRYPTO_ARCH = NONE
   SMM_CRYPTO_ARCH = NONE
   STANDALONEMM_CRYPTO_ARCH = NONE
-  STANDALONEMM_MMSUPV_CRYPTO_ARCH = X64
+  STANDALONEMM_MMSUPV_CRYPTO_ARCH = NONE
 
 ################################################################################
 #
@@ -90,7 +90,7 @@
   RegisterFilterLib           |MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
   # Math Libraries
-  FltUsedLib |MdePkg/Library/FltUsedLib/FltUsedLib.inf
+  FltUsedLib |MsCorePkg/Library/FltUsedLib/FltUsedLib.inf
   MathLib    |MsCorePkg/Library/MathLib/MathLib.inf
   SafeIntLib |MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
@@ -193,7 +193,7 @@
 
   # Memory Libraries
   BaseMemoryLib                  |MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
-  MemEncryptSevLib               |QemuQ35Pkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
+  MemEncryptSevLib               |QemuPkg/Library/MemEncryptSevLibNull/MemEncryptSevLibNull.inf
   MemoryTypeInfoSecVarCheckLib   |MdeModulePkg/Library/MemoryTypeInfoSecVarCheckLib/MemoryTypeInfoSecVarCheckLib.inf # MU_CHANGE TCBZ1086
   MemoryTypeInformationChangeLib |MdeModulePkg/Library/MemoryTypeInformationChangeLibNull/MemoryTypeInformationChangeLibNull.inf
   MtrrLib                        |UefiCpuPkg/Library/MtrrLib/MtrrLib.inf # Memory Type Range Register (https://en.wikipedia.org/wiki/Memory_type_range_register)
@@ -243,10 +243,9 @@
   TpmMeasurementLib       |MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   Tcg2PhysicalPresenceLib |QemuPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   Tpm2HelpLib             |SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
-!if $(TPM_ENABLE) == TRUE
-  Tcg2PhysicalPresenceLib |QemuPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
+!if $(TPM2_ENABLE) == TRUE
+  Tcg2PhysicalPresenceLib |SecurityPkg/Library/DxeTcg2PhysicalPresenceMinimumLib/DxeTcg2PhysicalPresenceMinimumLib.inf
   TpmMeasurementLib       |SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
-  Tpm2DebugLib            |SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibSimple.inf
 !endif
 
   # Shell Libraries
@@ -279,7 +278,7 @@
   JsonLiteParserLib |MsCorePkg/Library/JsonLiteParser/JsonLiteParser.inf
 
   # Qemu specific libraries
-  QemuFwCfgLib             |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
+  QemuFwCfgLib             |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgDxeLib.inf
   QemuFwCfgSimpleParserLib |QemuQ35Pkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   CcExitLib                |UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
 
@@ -325,7 +324,7 @@
 #########################################
 [LibraryClasses.common.SEC]
   TimerLib                   |QemuQ35Pkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
-  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
+  QemuFwCfgLib               |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
   HobLib                     |MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesLib             |MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib |MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
@@ -379,16 +378,17 @@
   CpuExceptionHandlerLib     |UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib                  |UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
   PcdLib                     |MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  QemuFwCfgLib               |QemuQ35Pkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
+  QemuFwCfgLib               |QemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   PcdDatabaseLoaderLib       |MdeModulePkg/Library/PcdDatabaseLoaderLib/Pei/PcdDatabaseLoaderLibPei.inf
   OemMfciLib                 |OemPkg/Library/OemMfciLib/OemMfciLibPei.inf
   ConfigKnobShimLib          |SetupDataPkg/Library/ConfigKnobShimLib/ConfigKnobShimPeiLib/ConfigKnobShimPeiLib.inf
   PolicyLib                  |PolicyServicePkg/Library/PeiPolicyLib/PeiPolicyLib.inf
+  BaseCryptLib               |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+  TlsLib                     |CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   SmmRelocationLib           |QemuQ35Pkg/Library/SmmRelocationLib/SmmRelocationLib.inf
-!if $(TPM_ENABLE) == TRUE
-  Tpm12DeviceLib             |SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
+!if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib              |SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
-  Tcg2PreUefiEventLogLib     |QemuPkg/Library/QemuPreUefiEventLogLibNull/QemuPreUefiEventLogLibNull.inf
+  Tcg2PreUefiEventLogLib     |SecurityPkg/Library/Tcg2PreUefiEventLogLibNull/Tcg2PreUefiEventLogLibNull.inf
 !endif
   RngLib                     |MdePkg/Library/PeiRngLib/PeiRngLib.inf
 
@@ -419,6 +419,9 @@
   PciLib   |QemuQ35Pkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
 
   OemMfciLib |OemPkg/Library/OemMfciLib/OemMfciLibDxe.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib                  |MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -437,6 +440,8 @@
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/RuntimeDxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/RuntimeDxeCryptLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -444,6 +449,7 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   CheckHwErrRecHeaderLib|MsWheaPkg/Library/CheckHwErrRecHeaderLib/CheckHwErrRecHeaderLib.inf
   FlatPageTableLib|UefiTestingPkg/Library/FlatPageTableLib/FlatPageTableLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|MsCorePkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
@@ -453,9 +459,7 @@
   UpdateFacsHardwareSignatureLib|OemPkg/Library/UpdateFacsHardwareSignatureLib/UpdateFacsHardwareSignatureLib.inf
   PcdDatabaseLoaderLib|MdeModulePkg/Library/PcdDatabaseLoaderLib/Dxe/PcdDatabaseLoaderLibDxe.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
-  PolicyLib|PolicyServicePkg/Library/DxePolicyLib/DxePolicyLib.inf
-!if $(TPM_ENABLE) == TRUE
-  Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibTcg/Tpm12DeviceLibTcg.inf
+!if $(TPM2_ENABLE) == TRUE
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
 !endif
 
@@ -527,6 +531,8 @@
   IoLib|MmSupervisorPkg/Library/BaseIoLibIntrinsicSysCall/BaseIoLibIntrinsic.inf
   SysCallLib|MmSupervisorPkg/Library/SysCallLib/SysCallLib.inf
   CpuLib|MmSupervisorPkg/Library/BaseCpuLibSysCall/BaseCpuLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/StandaloneMmCryptLib.inf
 
 !if $(PERF_TRACE_ENABLE) == TRUE
   PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/StandaloneMmPerformanceLib.inf
@@ -597,8 +603,6 @@
     gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|TRUE
     gMmSupervisorPkgTokenSpaceGuid.PcdMmSupervisorTestEnable|TRUE
   !endif
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateVariableRuntimeCacheBufferAllocation|TRUE
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
@@ -771,7 +775,7 @@
   # unknown) workloads / boot paths.
   #
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x80
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x20
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x2B
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x510
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x1C0
@@ -817,7 +821,7 @@
   gUefiQemuQ35PkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
   # Limit to SHA256 for now.
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x00002
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x02
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
@@ -831,7 +835,7 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
-  gUefiQemuQ35PkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
+  gQemuPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0
@@ -842,7 +846,7 @@
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
   # Set this to gEfiTpmDeviceInstanceTpm20DtpmGuid
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x5a, 0xf2, 0x6b, 0x28, 0xc3, 0xc2, 0x8c, 0x40, 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17}
 !endif
@@ -864,9 +868,11 @@
   !endif
 
 [PcdsDynamicHii]
-!if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|4|NV,BS
+!endif
+!if $(TPM_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS
 !endif
 
 ################################################################################
@@ -884,13 +890,27 @@
 [Components]
   !include $(SHARED_CRYPTO_PATH)/Driver/Bin/CryptoDriver.inc.dsc
 
-QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
+  QemuQ35Pkg/Library/PeiFvMeasurementExclusionLib/PeiFvMeasurementExclusionLib.inf
 
-QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
-QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
-QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/BaseResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/DxeResetSystemLib.inf
+  QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 
 [Components.X64]
+
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderDxe.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoLoaders/OneCryptoLoaderSupvMm.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+  $(ONE_CRYPTO_PATH)/$(TARGET)/X64/OneCryptoBin/OneCryptoBinSupvMm.inf {
+    <PcdsPatchableInModule>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+  }
+
   #########################################
   # DXE Phase modules
   #########################################
@@ -959,12 +979,11 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
 !endif
 
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
 !if $(TPM_REPLAY_ENABLED) == TRUE
       # Only TPM 2.0 is supported by the feature
       NULL|TpmTestingPkg/Overrides/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
 !else
-      NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
       NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
 !endif
 !endif
@@ -994,7 +1013,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
     <LibraryClasses>
       PciHostBridgeLib|QemuQ35Pkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-      PciHostBridgeUtilityLib|QemuQ35Pkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+      PciHostBridgeUtilityLib|QemuPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
       NULL|QemuQ35Pkg/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
   }
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
@@ -1059,10 +1078,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   AdvLoggerPkg/Application/AdvancedLogDumper/AdvancedLogDumper.inf
 
-  QemuQ35Pkg/QemuVideoDxe/QemuVideoDxe.inf
-
-
-  QemuQ35Pkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  QemuPkg/QemuVideoDxe/QemuVideoDxe.inf
 
   #
   # ISA Support
@@ -1076,15 +1092,15 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
     <LibraryClasses>
-      NULL|QemuQ35Pkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
+      NULL|QemuPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
-  QemuQ35Pkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  QemuPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
   #
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  QemuQ35Pkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  QemuPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   #
@@ -1234,7 +1250,11 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
 ## Where-Object {(Select-String -InputObject $_ -Pattern "MODULE_TYPE\s*=\s*UEFI_APPLICATION")} | ^
 ## ForEach-Object {$path = $_.FullName -replace '\\','/'; Write-Output $path}
 !if $(BUILD_UNIT_TESTS) == TRUE
-
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/BaseCryptLibUnitTestApp.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+      TlsLib|CryptoPkg/Library/BaseCryptLibOnOneCrypto/DxeCryptLib.inf
+  }
   AdvLoggerPkg/UnitTests/LineParser/LineParserTestApp.inf
   DfciPkg/UnitTests/DeviceIdTest/DeviceIdTestApp.inf
   # DfciPkg/UnitTests/DfciVarLockAudit/UEFI/DfciVarLockAuditTestApp.inf # DOESN'T PRODUCE OUTPUT
@@ -1334,7 +1354,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   #
   # TPM support
   #
-!if $(TPM_ENABLE) == TRUE
+!if $(TPM2_ENABLE) == TRUE
 !if $(TPM_REPLAY_ENABLED) == TRUE
   TpmTestingPkg/Overrides/Tcg2Dxe/Tcg2Dxe.inf {
     <LibraryClasses>
@@ -1361,7 +1381,7 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
   }
 !endif
 !endif
-!if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM_ENABLE) == TRUE
+!if $(TPM_CONFIG_ENABLE) == TRUE AND $(TPM2_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 
@@ -1399,5 +1419,13 @@ QemuQ35Pkg/Library/ResetSystemLib/StandaloneMmResetSystemLib.inf
       MfciRetrievePolicyLib|MfciPkg/Library/MfciRetrievePolicyLibViaHob/MfciRetrievePolicyLibViaHob.inf
       MfciDeviceIdSupportLib|MfciPkg/Library/MfciDeviceIdSupportLibSmbios/MfciDeviceIdSupportLibSmbios.inf
   }
+
+# The TpmShellApp can run without TPM enabled. It will report that the
+# Tcg2Protocol was not installed, however, it really isn't meant to run
+# without TPM enabled.
+!if $(TPM2_ENABLE) == TRUE
+  # TPM shell application to test PCR bank operations via TCG2 Protocol
+  SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
+!endif
 
 !include TpmTestingPkg/TpmReplay.dsc.inc

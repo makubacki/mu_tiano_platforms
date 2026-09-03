@@ -41,6 +41,14 @@
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
 
+!if $(TPM2_ENABLE) == TRUE
+  #
+  # Enable TPM support
+  #
+  MSFT:*_*_*_CC_FLAGS = /DTPM2_ENABLE
+  GCC:*_*_*_CC_FLAGS  = -DTPM2_ENABLE
+!endif
+
   #
   # Disable deprecated APIs.
   #
@@ -49,7 +57,7 @@
 
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:64
   GCC:*_GCC5_*_DLINK_FLAGS = -z common-page-size=64
-  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:64 /FILEALIGN:64
+  GCC:*_CLANGPDB_*_DLINK_FLAGS = /ALIGN:64
 
 # Force PE/COFF sections to be aligned at 4KB boundaries to support page level
 # protection of DXE_SMM_DRIVER/SMM_CORE modules

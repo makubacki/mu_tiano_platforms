@@ -34,6 +34,12 @@
 
 !include QemuQ35Pkg/QemuQ35PkgCommon.dsc.inc
 
+[LibraryClasses.X64.PEIM, LibraryClasses.X64.PEI_CORE]
+  # For now PEI will continue to use BaseCryptLibOnProtocolPpi instead of
+  # BaseCryptLibOnOneCrypto
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+
 [Components.IA32]
 !include QemuQ35Pkg/QemuQ35PkgCommonPei.dsc.inc
 
@@ -49,6 +55,14 @@
   # Exception tables are required for stack walks in the debugger.
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+
+!if $(TPM2_ENABLE) == TRUE
+  #
+  # Enable TPM support
+  #
+  MSFT:*_*_*_CC_FLAGS = /DTPM2_ENABLE
+  GCC:*_*_*_CC_FLAGS  = -DTPM2_ENABLE
+!endif
 
   #
   # Disable deprecated APIs.

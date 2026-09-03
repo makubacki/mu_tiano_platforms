@@ -85,11 +85,11 @@ stages:
               **/QEMUQ35_*.fd
             BuildArtifactsOther: ""
 
-          QemuSbsa_GCC_DEBUG:
-            BuildPackage: QemuSbsaPkg
-            BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+          QemuArmVirt_GCC_DEBUG:
+            BuildPackage: QemuArmVirtPkg
+            BuildFile: "Platforms/QemuArmVirtPkg/PlatformBuild.py"
             BuildArch: AARCH64
-            BuildFlags: "HAF_TFA_BUILD=TRUE"
+            BuildFlags: ""
             BuildTarget: "DEBUG"
             BuildExtraTag: ""
             BuildExtraStep:
@@ -103,11 +103,11 @@ stages:
               **/SECURE_FLASH0.fd
             BuildArtifactsOther: "**/unit_test_results/*"
 
-          QemuSbsa_GCC_RELEASE:
-            BuildPackage: QemuSbsaPkg
-            BuildFile: "Platforms/QemuSbsaPkg/PlatformBuild.py"
+          QemuArmVirt_GCC_RELEASE:
+            BuildPackage: QemuArmVirtPkg
+            BuildFile: "Platforms/QemuArmVirtPkg/PlatformBuild.py"
             BuildArch: AARCH64
-            BuildFlags: "HAF_TFA_BUILD=TRUE"
+            BuildFlags: ""
             BuildTarget: "RELEASE"
             BuildExtraTag: ""
             BuildExtraStep:
